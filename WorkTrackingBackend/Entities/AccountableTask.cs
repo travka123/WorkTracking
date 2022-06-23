@@ -9,4 +9,5 @@ public class AccountableTask
     public string Description { get; set; }
     public DateTime ReportingDate { get; set; }
     public DateTime CreatedDate { get; set; }
+    public int FirmId { get; set; }
 }
