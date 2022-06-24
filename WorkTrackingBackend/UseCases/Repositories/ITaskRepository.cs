@@ -5,6 +5,8 @@ namespace UseCases.Repositories;
 public interface ITaskRepository
 {
     public IQueryable<AccountableTask> AccountableTasks { get; }
-    public void AddTask(Task task);
-    public void UpdateTask(Task task);
+    public IQueryable<Unit> Units { get; }
+    public void AddTask(AccountableTask task);
+    public void UpdateTaskRange(IEnumerable<AccountableTask> tasks);
+    public void RemoveTaskRange(IEnumerable<AccountableTask> tasks);
 }

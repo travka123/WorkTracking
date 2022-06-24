@@ -1,4 +1,5 @@
 ﻿using Entities;
+using Microsoft.EntityFrameworkCore;
 using UseCases.Repositories;
 
 namespace EFData.Repositories
@@ -12,16 +13,33 @@ namespace EFData.Repositories
             _context = context;
         }
 
-        public IQueryable<AccountableTask> AccountableTasks => throw new NotImplementedException();
+        public IQueryable<AccountableTask> AccountableTasks =>
+            _context.Tasks
+                .AsNoTracking()
+                .Include(t => t.Unit)
+                .Include(t => t.Firm);
 
-        public void AddTask(Task task)
+        public IQueryable<Unit> Units => _context.Units.AsNoTracking();
+
+        public void AddTask(AccountableTask task)
         {
-            throw new NotImplementedException();
+            _context.Tasks.Add(task);
+            _context.SaveChanges();
+            _context.ChangeTracker.Clear();
         }
 
-        public void UpdateTask(Task task)
+        public void RemoveTaskRange(IEnumerable<AccountableTask> tasks)
         {
-            throw new NotImplementedException();
+            _context.Tasks.RemoveRange(tasks);
+            _context.SaveChanges();
+            _context.ChangeTracker.Clear();
+        }
+
+        public void UpdateTaskRange(IEnumerable<AccountableTask> tasks)
+        {
+            _context.Tasks.UpdateRange(tasks);
+            _context.SaveChanges();
+            _context.ChangeTracker.Clear();
         }
     }
 }
