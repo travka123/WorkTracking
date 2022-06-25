@@ -8,5 +8,5 @@ public interface ITaskRepository
     public IQueryable<Unit> Units { get; }
     public void AddTask(AccountableTask task);
     public void UpdateTaskRange(IEnumerable<AccountableTask> tasks);
-    public void RemoveTaskRange(IEnumerable<AccountableTask> tasks);
+    public void RemoveTaskRange(IEnumerable<int> tasksIds);
 }
