@@ -40,4 +40,14 @@ public class AuthHelper
 
         return new JwtSecurityTokenHandler().WriteToken(jwt);
     }
+
+    public static int GetUserId(ClaimsPrincipal claimsPrincipal)
+    {
+        var nameIdentifier = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier);
+        if (nameIdentifier is null)
+        {
+            throw new Exception("ClaimTypes.NameIdentifier is null");
+        }
+        return int.Parse(nameIdentifier.Value);
+    }
 }
