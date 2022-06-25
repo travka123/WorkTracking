@@ -10,6 +10,8 @@ public class AppDbContext : DbContext
     public DbSet<Firm> Firms { get; set; } = null!;
     public DbSet<OwnershipSystem> OwnershipSystems { get; set; } = null!;
     public DbSet<TaxationSystem> TaxationSystems { get; set; } = null!;
+    public DbSet<Unit> Units { get; set; } = null!;
+    public DbSet<AccountableTask> Tasks { get; set; } = null!;
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {

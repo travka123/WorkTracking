@@ -13,7 +13,9 @@ public class FirmRepository : IFirmRepository
         _appDbContext = appDbContext;
     }
 
-    public IQueryable<Firm> Firms => _appDbContext.Firms.AsNoTracking();
+    public IQueryable<Firm> Firms => _appDbContext.Firms
+        .AsNoTracking()
+        .Include(f => f.Manager);
 
     public IQueryable<OwnershipSystem> OwnershipSystems => _appDbContext.OwnershipSystems.AsNoTracking();
 

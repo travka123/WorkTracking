@@ -19,6 +19,6 @@ public class UserRepository : IUserRepository
     {
         _context.Users.Add(user);
         _context.SaveChanges();
-        _context.Entry(user).State = EntityState.Detached;
+        _context.ChangeTracker.Clear();
     }
 }

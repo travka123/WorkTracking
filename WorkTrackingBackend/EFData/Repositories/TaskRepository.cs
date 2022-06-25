@@ -28,16 +28,30 @@ namespace EFData.Repositories
             _context.ChangeTracker.Clear();
         }
 
-        public void RemoveTaskRange(IEnumerable<AccountableTask> tasks)
+        public void RemoveTaskRange(IEnumerable<int> tasksIds)
         {
-            _context.Tasks.RemoveRange(tasks);
+            var target = tasksIds.Select(id => new AccountableTask { Id = id }).ToList();
+
+            _context.Tasks.RemoveRange(target);
             _context.SaveChanges();
             _context.ChangeTracker.Clear();
         }
 
         public void UpdateTaskRange(IEnumerable<AccountableTask> tasks)
         {
-            _context.Tasks.UpdateRange(tasks);
+            var target = tasks.Select(t => new AccountableTask
+            {
+                Id = t.Id,
+                Name = t.Name,
+                CreationDate = t.CreationDate,
+                Description = t.Description,
+                Quantity = t.Quantity,
+                ReportingDate = t.ReportingDate,
+                FirmId = t.FirmId,
+                UnitId = t.UnitId,
+            });
+
+            _context.Tasks.UpdateRange(target);
             _context.SaveChanges();
             _context.ChangeTracker.Clear();
         }
