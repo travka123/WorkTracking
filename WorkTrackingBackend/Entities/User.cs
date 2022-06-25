@@ -6,4 +6,5 @@ public class User
     public string Login { get; set; }
     public byte[] Password { get; set; }
     public int? AdministratorId { get; set; }
+    public Administrator? Administrator { get; set; }
 }
