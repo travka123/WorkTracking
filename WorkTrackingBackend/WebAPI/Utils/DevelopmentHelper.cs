@@ -7,16 +7,13 @@ namespace WebAPI.Utils;
 
 public class DevelopmentHelper
 {
-    public static async Task FillDatabase(string connection)
+    public static async Task FillDatabase(AppDbContext context)
     {
-        var builder = new DbContextOptionsBuilder<AppDbContext>();
-        builder.UseSqlServer(connection);
-        using (var context = new AppDbContext(builder.Options))
-        {
-            context.Database.EnsureDeleted();
-            context.Database.EnsureCreated();
 
-            List<OwnershipSystem> ownershipSystems = new List<OwnershipSystem>()
+        context.Database.EnsureDeleted();
+        context.Database.EnsureCreated();
+
+        List<OwnershipSystem> ownershipSystems = new List<OwnershipSystem>()
         {
             new OwnershipSystem() {Name = "ИП"},
             new OwnershipSystem() {Name = "Самозанятый(ремесленник)"},
@@ -27,9 +24,9 @@ public class DevelopmentHelper
             new OwnershipSystem() {Name = "УП"},
             new OwnershipSystem() {Name = "ГУ"},
         };
-            context.OwnershipSystems.AddRange(ownershipSystems);
+        context.OwnershipSystems.AddRange(ownershipSystems);
 
-            List<TaxationSystem> taxationSystems = new List<TaxationSystem>()
+        List<TaxationSystem> taxationSystems = new List<TaxationSystem>()
         {
             new TaxationSystem() {Name="УСН с НДС с КУДИР (по оплате)"},
             new TaxationSystem() {Name="УСН с НДС с КУДИР (по отгрузке)"},
@@ -41,40 +38,129 @@ public class DevelopmentHelper
             new TaxationSystem() {Name="Единый налог"},
             new TaxationSystem() {Name="Прочее"},
         };
-            context.TaxationSystems.AddRange(taxationSystems);
+        context.TaxationSystems.AddRange(taxationSystems);
 
-            Administrator superadmin = new Administrator()
+        List<Unit> units = new()
             {
-                Login = "admin",
-                Password = Encoding.UTF8.GetBytes("admin"),
-            };
-            context.Administrators.Add(superadmin);
-
-            Firm testFirm = new Firm()
-            {
-                Name = "Рога и копыта",
-                Description = "desc",
-                Manager = superadmin,
-                OwnershipSystem = ownershipSystems[0],
-                TaxationSystem = taxationSystems[0]
+                new Unit() {Name = "day"},
+                new Unit() {Name = "month"},
+                new Unit() {Name = "year"},
             };
 
-            context.Firms.Add(testFirm);
+        context.Units.AddRange(units);
 
-            AccountableTask testTask = new AccountableTask()
+        // admin/user/firm/task
+
+        Administrator admin1 = new Administrator()
+        {
+            Login = "admin1",
+            Password = Encoding.UTF8.GetBytes("admin1"),
+        };
+
+        Administrator admin2 = new Administrator()
+        {
+            Login = "admin2",
+            Password = Encoding.UTF8.GetBytes("admin2"),
+        };
+
+        context.Administrators.Add(admin1);
+        context.Administrators.Add(admin2);
+
+        User user1 = new User()
+        {
+            Login = "user1.1",
+            Password = Encoding.UTF8.GetBytes("user1.1"),
+            Administrator = admin1
+        };
+
+        User user2 = new User()
+        {
+            Login = "user2.1",
+            Password = Encoding.UTF8.GetBytes("user2.1"),
+            Administrator = admin2
+        };
+
+        context.Users.Add(user1);
+        context.Users.Add(user2);
+
+        Firm firm11 = new Firm()
+        {
+            Name = "firm1.1.1",
+            Description = "desc1.1",
+            Manager = user1,
+            OwnershipSystem = ownershipSystems[0],
+            TaxationSystem = taxationSystems[0]
+        };
+
+        Firm firm12 = new Firm()
+        {
+            Name = "firm1.1.2",
+            Description = "desc1.2",
+            Manager = user1,
+            OwnershipSystem = ownershipSystems[1],
+            TaxationSystem = taxationSystems[1]
+        };
+
+        Firm firm2 = new Firm()
+        {
+            Name = "firm2.1.1",
+            Description = "desc2",
+            Manager = user2,
+            OwnershipSystem = ownershipSystems[1],
+            TaxationSystem = taxationSystems[1]
+        };
+
+        context.Firms.Add(firm11);
+        context.Firms.Add(firm12);
+        context.Firms.Add(firm2);
+
+        List<AccountableTask> tasks = new()
             {
-                Name = "test task",
-                CreationDate = DateTime.Now,
-                Description = "abcd",
-                Firm = testFirm,
-                Quantity = 1,
-                ReportingDate = DateTime.Now,
-                Unit = new Unit() { Name = "qwerty" }
+                new AccountableTask()
+                {
+                    Name = "task1.1.1.1",
+                    CreationDate = DateTime.Now,
+                    Description = "abcd",
+                    Firm = firm11,
+                    Quantity = 1,
+                    ReportingDate = DateTime.Now,
+                    Unit = units[0],
+                },
+                new AccountableTask()
+                {
+                    Name = "task1.1.1.2",
+                    CreationDate = DateTime.Now,
+                    Description = "dcba",
+                    Firm = firm11,
+                    Quantity = 1,
+                    ReportingDate = DateTime.Now,
+                    Unit = units[0],
+                },
+                new AccountableTask()
+                {
+                    Name = "task1.1.2.1",
+                    CreationDate = DateTime.Now,
+                    Description = "dcba",
+                    Firm = firm12,
+                    Quantity = 1,
+                    ReportingDate = DateTime.Now,
+                    Unit = units[1],
+                },
+                new AccountableTask()
+                {
+                    Name = "task2.1.1.1",
+                    CreationDate = DateTime.Now,
+                    Description = "q q q q",
+                    Firm = firm2,
+                    Quantity = 1,
+                    ReportingDate = DateTime.Now,
+                    Unit = units[2],
+                },
             };
 
-            context.Tasks.Add(testTask);
+        context.Tasks.AddRange(tasks);
 
-            await context.SaveChangesAsync();
-        }
+        await context.SaveChangesAsync();
+
     }
 }

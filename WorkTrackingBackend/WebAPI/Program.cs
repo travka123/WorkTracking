@@ -44,7 +44,7 @@ app.MapPost("/login", ([FromBody] LoginRequest request, [FromServices] LoginInte
     {
         return Results.Unauthorized();
     }
-    string token = AuthHelper.CreateToken(user.Id, user.GetType().ToString());
+    string token = AuthHelper.CreateToken(user.Id, user.GetType().Name.ToString());
     return Results.Ok(new { token = token, userId = user.Id, login = user.Login, role = user.GetType().Name });
 });
 
@@ -107,9 +107,29 @@ app.MapGet("/user/units", [Authorize] (ClaimsPrincipal claimsPrincipal,
     return result.Select(f => new ItemView(f.Id, f.Name));
 });
 
+app.MapGet("/admin/tasks", [Authorize(Roles = "Administrator")] (ClaimsPrincipal claimsPrincipal,
+    [FromServices] AdminGetTasksInteractor getTasks) =>
+{
+    int userId = AuthHelper.GetUserId(claimsPrincipal);
+    return getTasks.Handle(userId).Select(t => new TaskView(t)).ToList();
+});
+
+app.MapGet("/admin/firms", [Authorize(Roles = "Administrator")] (ClaimsPrincipal claimsPrincipal,
+    [FromServices] AdminGetFirmsInteractor getFirms) =>
+{
+    int userId = AuthHelper.GetUserId(claimsPrincipal);
+    var result = getFirms.Handle(userId);
+    return result.Select(f => new ItemView(f.Id, f.Name)).ToList();
+});
+
 if (app.Environment.IsDevelopment())
 {
-    await DevelopmentHelper.FillDatabase(dbConnection);
+    using (var scope = app.Services.CreateScope())
+    {
+        await DevelopmentHelper.FillDatabase(scope.ServiceProvider.GetService<AppDbContext>()!);
+    }
 }
 
 app.Run();
+
+public partial class Program { }

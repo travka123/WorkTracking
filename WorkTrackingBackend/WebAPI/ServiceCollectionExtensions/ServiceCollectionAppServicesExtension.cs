@@ -21,6 +21,8 @@ public static class ServiceCollectionAppServicesExtension
         services.AddScoped<GetUnitsInteractor>();
 
         services.AddScoped<AdminAddUserInteractor>();
+        services.AddScoped<AdminGetTasksInteractor>();
+        services.AddScoped<AdminGetFirmsInteractor>();
 
         return services;
     }

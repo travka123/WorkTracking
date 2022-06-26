@@ -11,4 +11,10 @@ public record TaskView(int id, string name, ItemView unit, int quantity,
     {
 
     }
+
+    public TaskView() : this(0, String.Empty, new ItemView(0, String.Empty), 0, String.Empty,
+        DateTime.MinValue, new ItemView(0, String.Empty), DateTime.MinValue)
+    {
+
+    }
 }
