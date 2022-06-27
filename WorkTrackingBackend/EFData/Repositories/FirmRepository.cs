@@ -15,6 +15,8 @@ public class FirmRepository : IFirmRepository
 
     public IQueryable<Firm> Firms => _appDbContext.Firms
         .AsNoTracking()
+        .Include(f => f.OwnershipSystem)
+        .Include(f => f.TaxationSystem)
         .Include(f => f.Manager);
 
     public IQueryable<OwnershipSystem> OwnershipSystems => _appDbContext.OwnershipSystems.AsNoTracking();
