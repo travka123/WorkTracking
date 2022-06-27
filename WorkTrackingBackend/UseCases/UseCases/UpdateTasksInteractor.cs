@@ -6,12 +6,10 @@ namespace UseCases.UseCases;
 public class UpdateTasksInteractor : IRequestHandler<UpdateTasksRequest, bool>
 {
     private readonly ITaskRepository _taskRepository;
-    private readonly IFirmRepository _firmRepository;
 
-    public UpdateTasksInteractor(ITaskRepository taskRepository, IFirmRepository firmRepository)
+    public UpdateTasksInteractor(ITaskRepository taskRepository)
     {
         _taskRepository = taskRepository;
-        _firmRepository = firmRepository;
     }
 
     public bool Handle(UpdateTasksRequest request)

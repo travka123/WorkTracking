@@ -119,7 +119,7 @@ app.MapGet("/admin/firms", [Authorize(Roles = "Administrator")] (ClaimsPrincipal
 {
     int userId = AuthHelper.GetUserId(claimsPrincipal);
     var result = getFirms.Handle(userId);
-    return result.Select(f => new ItemView(f.Id, f.Name)).ToList();
+    return result.Select(f => new FirmView(f)).ToList();
 });
 
 if (app.Environment.IsDevelopment())
