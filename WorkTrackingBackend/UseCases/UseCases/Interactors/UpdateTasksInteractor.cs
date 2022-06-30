@@ -27,7 +27,7 @@ public class UpdateTasksInteractor : IRequestHandler<UpdateTasksRequest, bool>
         var firmsIds = request.updates
             .Where(u => u.firmId.HasValue)
             .Select(u => u.firmId!.Value)
-            .ToArray();
+            .ToHashSet();
 
         var nFrimsAvalible = request.getFirmsInteractor.Handle(request.actorId)
             .Where(t => firmsIds.Contains(t.Id))
