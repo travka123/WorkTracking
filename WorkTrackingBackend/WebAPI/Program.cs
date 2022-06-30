@@ -124,6 +124,17 @@ app.MapGet("/admin/tasks", [Authorize(Roles = "Administrator")] (ClaimsPrincipal
     return getTasks.Handle(userId).Select(t => new TaskView(t)).ToList();
 });
 
+app.MapPost("/admin/tasks", [Authorize] ([FromBody] TaskAddForm form, ClaimsPrincipal claimsPrincipal,
+    [FromServices] AddTaskInteractor addTask, [FromServices] AdminGetFirmsInteractor getFirms) =>
+{
+    FormChecker.CheckForNull(form);
+    int userId = AuthHelper.GetUserId(claimsPrincipal);
+    var task = addTask.Handle(new AddTaskRequest(getFirms, form.name!, form.unitId!.Value,
+        form.quantity!.Value, form.description!, form.reportingDate!.Value, form.firmId!.Value,
+        userId));
+    return Results.Created($"/user/tasks/{task.Id}", new TaskView(task));
+});
+
 app.MapGet("/admin/firms", [Authorize(Roles = "Administrator")] (ClaimsPrincipal claimsPrincipal,
     [FromServices] AdminGetFirmsInteractor getFirms) =>
 {
