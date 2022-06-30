@@ -14,27 +14,26 @@ public class UpdateTasksInteractor : IRequestHandler<UpdateTasksRequest, bool>
 
     public bool Handle(UpdateTasksRequest request)
     {
-        var tasksIds = request.updates.Select(t => t.id).ToArray();
+        var tasksIds = request.updates
+            .Select(t => t.id)
+            .ToArray();
 
         var oldTasks = request.getTasksInteractor.Handle(request.actorId)
             .Where(t => tasksIds.Contains(t.Id))
             .ToDictionary(t => t.Id, t => t);
 
-        if (tasksIds.Count() != oldTasks.Count())
-        {
-            return false;
-        }
+        if (tasksIds.Count() != oldTasks.Count()) throw new UseCaseExeption("invalid tasks ids");
 
-        var firmsIds = request.updates.Where(u => u.firmId.HasValue).Select(u => u.firmId!.Value).ToArray();
+        var firmsIds = request.updates
+            .Where(u => u.firmId.HasValue)
+            .Select(u => u.firmId!.Value)
+            .ToArray();
 
         var nFrimsAvalible = request.getFirmsInteractor.Handle(request.actorId)
             .Where(t => firmsIds.Contains(t.Id))
             .Count();
 
-        if (nFrimsAvalible != firmsIds.Count())
-        {
-            return false;
-        }
+        if (nFrimsAvalible != firmsIds.Count()) throw new UseCaseExeption("invalid tasks data");
 
         try
         {
@@ -56,7 +55,7 @@ public class UpdateTasksInteractor : IRequestHandler<UpdateTasksRequest, bool>
         }
         catch
         {
-            return false;
+            throw new UseCaseExeption("invalid tasks data");
         }
 
         return true;

@@ -14,16 +14,16 @@ public class RemoveTasksInteractor : IRequestHandler<RemoveTasksRequest, bool>
 
     public bool Handle(RemoveTasksRequest request)
     {
+        var nRequested = request.tasksIds.Count();
+
         var nAvailable = request.getTasksInteractor.Handle(request.actorId)
             .Where(t => request.tasksIds.Contains(t.Id))
             .Count();
 
-        if (request.tasksIds.Count() != nAvailable)
-        {
-            return false;
-        }
+        if (nRequested != nAvailable) throw new UseCaseExeption("invalid tasks ids");
 
         _taskRepository.RemoveTaskRange(request.tasksIds);
+
         return true;
     }
 }

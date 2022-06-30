@@ -1,3 +1,3 @@
 ﻿namespace WebAPI.Data.Forms;
 
-public record UserAddForm(string login, byte[] password);
+public record UserAddForm(string? login, byte[]? password);

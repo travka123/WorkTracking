@@ -3,7 +3,7 @@ using UseCases.Repositories;
 
 namespace UseCases.UseCases;
 
-public class GetUnitsInteractor : IRequestHandler<int, IEnumerable<Unit>>
+public class GetUnitsInteractor : IRequestHandler<int, IQueryable<Unit>>
 {
     private readonly ITaskRepository _taskRepository;
 
@@ -12,8 +12,8 @@ public class GetUnitsInteractor : IRequestHandler<int, IEnumerable<Unit>>
         _taskRepository = taskRepository;
     }
 
-    public IEnumerable<Unit> Handle(int actorId)
+    public IQueryable<Unit> Handle(int actorId)
     {
-        return _taskRepository.Units.ToList();
+        return _taskRepository.Units;
     }
 }

@@ -3,7 +3,7 @@ using UseCases.Repositories;
 
 namespace UseCases.UseCases;
 
-public class LoginInteractor : IRequestHandler<LoginRequest, LoginResponse>
+public class LoginInteractor : IRequestHandler<LoginRequest, User>
 {
     private IUserRepository _userRepository;
 
@@ -12,12 +12,16 @@ public class LoginInteractor : IRequestHandler<LoginRequest, LoginResponse>
         _userRepository = userRepository;
     }
 
-    public LoginResponse Handle(LoginRequest request)
+    public User Handle(LoginRequest request)
     {
-        User? user = _userRepository.Users.SingleOrDefault(user => user.Login == request.login && user.Password.SequenceEqual(request.password));
-        return new LoginResponse(user);
+        var user = _userRepository.Users
+            .SingleOrDefault(user => user.Login == request.login &&
+                user.Password.SequenceEqual(request.password));
+
+        if (user is null) throw new UseCaseExeption("login failed");
+
+        return user;
     }
 }
 
 public record LoginRequest(string login, byte[] password);
-public record LoginResponse(User? user);
