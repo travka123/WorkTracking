@@ -61,7 +61,7 @@ app.MapPost("/users", [Authorize(Roles = "Administrator")] ([FromBody] UserAddFo
 {
     FormChecker.CheckForNull(form);
     int userId = AuthHelper.GetUserId(claimsPrincipal);
-    var result = addUser.Handle(new AdminAddUserRequest(userId, form.login, form.password));
+    var result = addUser.Handle(new AdminAddUserRequest(userId, form.login!, form.password!));
     return result.user;
 });
 
@@ -141,6 +141,15 @@ app.MapGet("/admin/firms", [Authorize(Roles = "Administrator")] (ClaimsPrincipal
     int userId = AuthHelper.GetUserId(claimsPrincipal);
     var result = getFirms.Handle(userId);
     return result.Select(f => new FirmView(f)).ToList();
+});
+
+app.MapPut("/admin/tasks", [Authorize] ([FromBody] IEnumerable<TaskUpdate> form, ClaimsPrincipal claimsPrincipal,
+    [FromServices] UpdateTasksInteractor updateTasks, [FromServices] AdminGetTasksInteractor getTasks,
+    [FromServices] AdminGetFirmsInteractor getFirms) =>
+{
+    int userId = AuthHelper.GetUserId(claimsPrincipal);
+    var result = updateTasks.Handle(new UpdateTasksRequest(getTasks, getFirms, form, userId));
+    return result ? Results.Ok() : Results.BadRequest();
 });
 
 if (app.Environment.IsDevelopment())
