@@ -1,6 +1,6 @@
 ﻿using EFData.Repositories;
 using UseCases.Repositories;
-using UseCases.UseCases;
+using UseCases.UseCases.Interactors;
 
 namespace WebAPI.ServiceCollectionExtensions;
 

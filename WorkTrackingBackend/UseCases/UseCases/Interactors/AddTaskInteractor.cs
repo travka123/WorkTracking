@@ -1,10 +1,10 @@
 ﻿using Entities;
 using UseCases.Repositories;
 
-namespace UseCases.UseCases;
+namespace UseCases.UseCases.Interactors;
 
 public class AddTaskInteractor : IRequestHandler<AddTaskRequest, AccountableTask>
-{ 
+{
     private readonly ITaskRepository _taskRepository;
 
     public AddTaskInteractor(ITaskRepository taskRepository)
@@ -18,7 +18,7 @@ public class AddTaskInteractor : IRequestHandler<AddTaskRequest, AccountableTask
             .SingleOrDefault(f => f.Id == request.firmId);
 
         if (firm is null) throw new UseCaseExeption("invalid task data");
-     
+
         var taskData = new AccountableTask
         {
             Name = request.name,

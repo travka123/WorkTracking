@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using UseCases.UseCases;
+using UseCases.UseCases.Interactors;
 using WebAPI.Data.Forms;
 using WebAPI.Data.Views;
 using WebAPI.Middleware;

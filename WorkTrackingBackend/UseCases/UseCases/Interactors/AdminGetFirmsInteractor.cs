@@ -1,7 +1,7 @@
 ﻿using Entities;
 using UseCases.Repositories;
 
-namespace UseCases.UseCases
+namespace UseCases.UseCases.Interactors
 {
     public class AdminGetFirmsInteractor : IRequestHandler<int, IQueryable<Firm>>
     {

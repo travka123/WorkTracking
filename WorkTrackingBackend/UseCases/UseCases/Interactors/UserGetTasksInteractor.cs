@@ -1,7 +1,7 @@
 ﻿using Entities;
 using UseCases.Repositories;
 
-namespace UseCases.UseCases;
+namespace UseCases.UseCases.Interactors;
 
 public class UserGetTasksInteractor : IRequestHandler<int, IQueryable<AccountableTask>>
 {
