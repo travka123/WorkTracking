@@ -143,6 +143,14 @@ app.MapGet("/admin/firms", [Authorize(Roles = "Administrator")] (ClaimsPrincipal
     return result.Select(f => new FirmView(f)).ToList();
 });
 
+app.MapDelete("/admin/tasks", [Authorize] ([FromBody] IEnumerable<int> tasksIds, ClaimsPrincipal claimsPrincipal,
+    [FromServices] RemoveTasksInteractor removeTasks, [FromServices] AdminGetTasksInteractor getTasks) =>
+{
+    int userId = AuthHelper.GetUserId(claimsPrincipal);
+    var result = removeTasks.Handle(new RemoveTasksRequest(getTasks, tasksIds, userId));
+    return result ? Results.Ok() : Results.BadRequest();
+});
+
 app.MapPut("/admin/tasks", [Authorize] ([FromBody] IEnumerable<TaskUpdate> form, ClaimsPrincipal claimsPrincipal,
     [FromServices] UpdateTasksInteractor updateTasks, [FromServices] AdminGetTasksInteractor getTasks,
     [FromServices] AdminGetFirmsInteractor getFirms) =>
