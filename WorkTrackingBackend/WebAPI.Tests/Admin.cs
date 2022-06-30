@@ -57,7 +57,7 @@ public class Admin
         await TestHelper.Authorize(client, "admin1", "admin1");
 
         var response = await client.GetAsync("/admin/tasks");
-        var actualTasks = (await response.Content.ReadFromJsonAsync<IEnumerable<TaskView>>())!;
+        var actualTasks = (await response.Content.ReadFromJsonAsync<IEnumerable<UserTaskView>>())!;
 
         using (var scope = application.Services.CreateScope())
         {

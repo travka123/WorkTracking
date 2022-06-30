@@ -30,7 +30,7 @@ public class User
         await TestHelper.Authorize(client, "user1.1", "user1.1");
 
         var response = await client.GetAsync("/user/tasks");
-        var actualTasks = (await response.Content.ReadFromJsonAsync<IEnumerable<TaskView>>())!;
+        var actualTasks = (await response.Content.ReadFromJsonAsync<IEnumerable<UserTaskView>>())!;
 
         using (var scope = application.Services.CreateScope())
         {

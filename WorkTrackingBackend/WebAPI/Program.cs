@@ -70,7 +70,7 @@ app.MapGet("/user/tasks", [Authorize] (ClaimsPrincipal claimsPrincipal,
 {
     int userId = AuthHelper.GetUserId(claimsPrincipal);
     var result = getTasks.Handle(userId);
-    return result.Select(t => new TaskView(t)).ToList();
+    return result.Select(t => new UserTaskView(t)).ToList();
 });
 
 app.MapPost("/user/tasks", [Authorize] ([FromBody] TaskAddForm form, ClaimsPrincipal claimsPrincipal, 
@@ -81,7 +81,7 @@ app.MapPost("/user/tasks", [Authorize] ([FromBody] TaskAddForm form, ClaimsPrinc
     var task = addTask.Handle(new AddTaskRequest(getFirms, form.name!, form.unitId!.Value, 
         form.quantity!.Value, form.description!, form.reportingDate!.Value, form.firmId!.Value,
         userId));
-    return Results.Created($"/user/tasks/{task.Id}", new TaskView(task));
+    return Results.Created($"/user/tasks/{task.Id}", new UserTaskView(task));
 });
 
 app.MapDelete("/user/tasks", [Authorize] ([FromBody] IEnumerable<int> tasksIds, ClaimsPrincipal claimsPrincipal,
@@ -118,10 +118,14 @@ app.MapGet("/user/units", [Authorize] (ClaimsPrincipal claimsPrincipal,
 });
 
 app.MapGet("/admin/tasks", [Authorize(Roles = "Administrator")] (ClaimsPrincipal claimsPrincipal,
-    [FromServices] AdminGetTasksInteractor getTasks) =>
+    [FromServices] AdminGetTasksInteractor getTasks, [FromServices] AdminGetFirmsInteractor getFirms) =>
 {
     int userId = AuthHelper.GetUserId(claimsPrincipal);
-    return getTasks.Handle(userId).Select(t => new TaskView(t)).ToList();
+    var tasks = getTasks.Handle(userId).ToList();
+    var firmsIds = tasks.Select(t => t.Firm.Id);
+    var firms = getFirms.Handle(userId).Where(f => firmsIds.Contains(f.Id)).ToDictionary(f => f.Id);
+    foreach (var task in tasks) task.Firm = firms[task.FirmId];
+    return tasks;
 });
 
 app.MapPost("/admin/tasks", [Authorize] ([FromBody] TaskAddForm form, ClaimsPrincipal claimsPrincipal,
@@ -132,15 +136,8 @@ app.MapPost("/admin/tasks", [Authorize] ([FromBody] TaskAddForm form, ClaimsPrin
     var task = addTask.Handle(new AddTaskRequest(getFirms, form.name!, form.unitId!.Value,
         form.quantity!.Value, form.description!, form.reportingDate!.Value, form.firmId!.Value,
         userId));
-    return Results.Created($"/user/tasks/{task.Id}", new TaskView(task));
-});
-
-app.MapGet("/admin/firms", [Authorize(Roles = "Administrator")] (ClaimsPrincipal claimsPrincipal,
-    [FromServices] AdminGetFirmsInteractor getFirms) =>
-{
-    int userId = AuthHelper.GetUserId(claimsPrincipal);
-    var result = getFirms.Handle(userId);
-    return result.Select(f => new FirmView(f)).ToList();
+    task.Firm = getFirms.Handle(userId).Single(f => f.Id == task.FirmId);
+    return Results.Created($"/user/tasks/{task.Id}", new AdminTaskView(task));
 });
 
 app.MapDelete("/admin/tasks", [Authorize] ([FromBody] IEnumerable<int> tasksIds, ClaimsPrincipal claimsPrincipal,
@@ -158,6 +155,14 @@ app.MapPut("/admin/tasks", [Authorize] ([FromBody] IEnumerable<TaskUpdate> form,
     int userId = AuthHelper.GetUserId(claimsPrincipal);
     var result = updateTasks.Handle(new UpdateTasksRequest(getTasks, getFirms, form, userId));
     return result ? Results.Ok() : Results.BadRequest();
+});
+
+app.MapGet("/admin/firms", [Authorize(Roles = "Administrator")] (ClaimsPrincipal claimsPrincipal,
+    [FromServices] AdminGetFirmsInteractor getFirms) =>
+{
+    int userId = AuthHelper.GetUserId(claimsPrincipal);
+    var result = getFirms.Handle(userId);
+    return result.Select(f => new AdminFirmView(f)).ToList();
 });
 
 if (app.Environment.IsDevelopment())
